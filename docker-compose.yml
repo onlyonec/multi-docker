@@ -16,11 +16,9 @@ services:
     ports:
       - 3050:80
   api:
-    build:
-      context: server
-      dockerfile: Dockerfile.dev
+    image: node:alpine
+    working_dir: /app
     volumes:
-      - /app/node_modules
       - ./server:/app
     environment:
       - REDIS_HOST=redis
@@ -32,23 +30,20 @@ services:
       - PGPASSWORD=password
     command: npm run dev -- -L
   worker:
-    build:
-      context: worker
-      dockerfile: Dockerfile.dev
+    image: node:alpine
+    working_dir: /app
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
     volumes:
-      - /app/node_modules
       - ./worker:/app
     command: npm run dev -- -L # -L: enable polling to watch for changes
   client:
-    build:
-      context: client
-      dockerfile: Dockerfile.dev
+    image: node:alpine
+    working_dir: /app
     stdin_open: true # important for react-scripts run
     environment:
       - CHOKIDAR_USEPOLLING=true # enable polling to watch for changes
     volumes:
-      - /app/node_modules
       - ./client:/app
+    command: ["npm", "run", "start"]
